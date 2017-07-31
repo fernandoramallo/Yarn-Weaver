@@ -20,6 +20,10 @@ public class YarnWeaverMain : MonoBehaviour {
 
 	public GameObject sidebar;
 	public GameObject[] workArea;
+  public GameObject loadButton;
+  public GameObject refreshButton;
+  public GameObject exitButton;
+  public Text dragHint;
 
 	DialogueRunner dialogueRunner;
 
@@ -32,6 +36,15 @@ public class YarnWeaverMain : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+    #if UNITY_WEBGL
+    dragHint.gameObject.SetActive(true);
+    loadButton.SetActive(false);
+    refreshButton.SetActive(false);
+    exitButton.SetActive(false);
+    recentFilesList.gameObject.SetActive(false);
+    #else
+    dragHint.gameObject.SetActive(false);
+
 		// build recent file list
 		previousFilePaths.Clear(); // just to be safe
 		while ( PlayerPrefs.HasKey( prefsKey + previousFilePaths.Count.ToString() )) {
@@ -45,6 +58,7 @@ public class YarnWeaverMain : MonoBehaviour {
 		} else {
 			recentFilesList.gameObject.SetActive( false );
 		}
+    #endif
 
 		dialogueRunner = FindObjectOfType<DialogueRunner>();
 		filenameLabel.text = "";
@@ -64,6 +78,10 @@ public class YarnWeaverMain : MonoBehaviour {
 			filenameLabel.text += " > " + (dialogueRunner.isDialogueRunning && dialogueRunner.currentNodeName != null && dialogueRunner.currentNodeName.Length > 0 ? dialogueRunner.currentNodeName : "(STOPPED)" );
 		}
 		foreach (var go in workArea) {
+      #if UNITY_WEBGL
+      if (go == refreshButton)
+        continue;
+      #endif
 			go.SetActive( isFileOpen );
 		}
 		sidebar.SetActive( !isFileOpen );
@@ -140,6 +158,24 @@ public class YarnWeaverMain : MonoBehaviour {
 		StartCurrentFile();
 	}
 
+  #if UNITY_WEBGL
+  // We load a pre-loaded dialog for WebGL since we can't load from the file system
+  IEnumerator OutputRoutineFromLoadedJson(string url, string fileContents) {
+    dialogueRunner.Stop();
+    while (dialogueRunner.isDialogueRunning) {
+      yield return 0;
+    }
+    dialogueRunner.Clear();
+
+    currentFilePath = url;
+    dialogueRunner.AddScript( fileContents );
+
+    yield return 0;
+
+    StartCurrentFile();
+  }
+  #endif
+
 	string GetStartNode () {
 		// search for a node that starts with "Start" or with the filename
 		string filename = Path.GetFileNameWithoutExtension( currentFilePath );
@@ -159,4 +195,8 @@ public class YarnWeaverMain : MonoBehaviour {
 			dialogueRunner.StartDialogue();
 		}
 	}
+
+  public void OnFileDropped(string filePath, string fileContents) {
+    StartCoroutine (OutputRoutineFromLoadedJson (filePath, fileContents));
+  }
 }

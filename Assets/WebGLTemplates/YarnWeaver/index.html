@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>%UNITY_WEB_NAME%</title>
+    <script src="%UNITY_WEBGL_LOADER_URL%"></script>
+    <script src="draghandler.js"></script>
+	<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+	<link rel="icon" href="favicon.ico" type="image/x-icon">
+    <script>
+      var gameInstance = UnityLoader.instantiate("gameContainer", "%UNITY_WEBGL_BUILD_URL%");
+      window.gameInstance = gameInstance;
+    </script>
+	<style>
+		body {
+		  	margin: 0;
+		  	padding: 0;
+  		  	color: white;
+  	 	  	text-align: center;
+  		  	font-family: sans-serif;
+		}
+		#footer {
+			width: 100%;
+			left: 0; bottom: 0;
+			margin-bottom: 8px;
+			position: absolute;
+			text-align: center;
+			font-size: 10pt;
+		}
+		#footer a { color: white; }
+		#dragfeedback {
+			top: 0; left: 0;
+    		width: 100%; height: 100%;
+    		font-size: 32pt;
+    		position: absolute;
+    		background-color: rgba(0,0,0,0.5);
+    		color: white;
+    		text-align: center;
+    		font-family: sans-serif;
+    		text-shadow: 3px 1px 16px black;
+			pointer-events: none;
+		}
+		#dragtext { position: relative; top: 45%; transformY(-50%); }
+		
+		#gameContainer canvas {
+			top: 0; left: 0;
+			width: 100%; height: 100%;
+			position: absolute;
+			background-color: #9390d4;
+		}
+		#gameContainer {
+			position: relative;
+			width: 100vw;
+			height: 100vh;
+		}
+		.webgl-content * {border: 0; margin: 0; padding: 0}
+	</style>
+  </head>
+  
+  <body>
+    <div id="gameContainer"><div id="canvas"></div></div>
+	<div id="dragfeedback"><p id="dragtext">Drag file here to load it</p></div></div>
+	<div id="footer"><a href="https://github.com/radiatoryang/Yarn-Weaver" target="_blank">Yarn-Weaver, a simple tool for testing <a href="https://github.com/InfiniteAmmoInc/Yarn" target="_blank">Yarn</a> files</a></div>
+  </body>
+  
+</html>
